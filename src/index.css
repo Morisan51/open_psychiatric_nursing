@@ -1,0 +1,45 @@
+/* Google Fontsは@importより先に置く必要がある */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #0a0f0a;
+  --bg-secondary: #0d1117;
+  --bg-gradient: linear-gradient(135deg, #0a1a0a 0%, #1a0a2e 100%);
+
+  --text-primary: #e8e8e8;
+  --text-secondary: #888888;
+
+  --accent-green:  #aaff00;
+  --accent-cyan:   #00ffff;
+  --accent-purple: #bf5fff;
+  --accent-blue:   #4d9fff;
+  --accent-orange: #ff6b35;
+  --accent-yellow: #ffd700;
+  --accent-pink:   #ff3399;
+  --accent-teal:   #00e5cc;
+  --accent-red:    #ff4444;
+
+  --status-live:    #aaff00;
+  --status-warning: #ff6b35;
+  --status-unknown: #888888;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  touch-action: manipulation;
+}
+
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
