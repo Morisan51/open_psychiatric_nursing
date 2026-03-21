@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useAssessmentContext } from '../context/AssessmentContext';
 import { SummaryTable } from '../components/summary/SummaryTable';
-import { generateSignalPrompt, generateBriefPrompt } from '../components/summary/summaryHelpers';
+import {
+  generateSignalPrompt, generateBriefPrompt,
+  generatePswSignalPrompt, generatePswBriefPrompt,
+  generateLongTermSignalPrompt, generateLongTermBriefPrompt,
+} from '../components/summary/summaryHelpers';
 
 type Mode = 'signal' | 'brief';
 
@@ -53,7 +57,9 @@ function CopyButton({ getText }: { getText: () => string }) {
 }
 
 export function ExecutiveSummaryPage() {
-  const { state, totalScore, unknownItems } = useAssessmentContext();
+  const { state, totalScore, unknownItems, assessmentType } = useAssessmentContext();
+  const isPsw = assessmentType === 'psw';
+  const isLongTerm = assessmentType === 'long_term';
   const { evaluations } = state;
   const answeredCount = Object.keys(evaluations).length;
 
@@ -63,7 +69,16 @@ export function ExecutiveSummaryPage() {
   const [notes] = useState<string[]>(() => {
     try {
       const saved = localStorage.getItem('summary-notes');
-      return saved ? JSON.parse(saved) : ['', '', '', '', ''];
+      if (!saved) return ['', '', '', '', ''];
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed;
+      const { notes: n, savedAt } = parsed as { notes: string[]; savedAt: number };
+      const TTL_MS = 24 * 60 * 60 * 1000;
+      if (Date.now() - savedAt > TTL_MS) {
+        localStorage.removeItem('summary-notes');
+        return ['', '', '', '', ''];
+      }
+      return n;
     } catch {
       return ['', '', '', '', ''];
     }
@@ -157,7 +172,11 @@ export function ExecutiveSummaryPage() {
                 fontFamily: 'inherit',
                 letterSpacing: '0.02em',
               }}>
-                {generateSignalPrompt(evaluations, totalScore, unknownItems, notes)}
+                {isLongTerm
+                  ? generateLongTermSignalPrompt(evaluations, totalScore, unknownItems, notes)
+                  : isPsw
+                  ? generatePswSignalPrompt(evaluations, totalScore, unknownItems, notes)
+                  : generateSignalPrompt(evaluations, totalScore, unknownItems, notes)}
               </div>
             </div>
           )}
@@ -180,17 +199,31 @@ export function ExecutiveSummaryPage() {
                 fontFamily: 'inherit',
                 letterSpacing: '0.02em',
               }}>
-                {generateBriefPrompt(evaluations, totalScore, unknownItems, notes)}
+                {isLongTerm
+                  ? generateLongTermBriefPrompt(evaluations, totalScore, unknownItems, notes)
+                  : isPsw
+                  ? generatePswBriefPrompt(evaluations, totalScore, unknownItems, notes)
+                  : generateBriefPrompt(evaluations, totalScore, unknownItems, notes)}
               </div>
             </div>
           )}
 
           <CopyButton
-            getText={() =>
-              mode === 'signal'
+            getText={() => {
+              if (isLongTerm) {
+                return mode === 'signal'
+                  ? generateLongTermSignalPrompt(evaluations, totalScore, unknownItems, notes)
+                  : generateLongTermBriefPrompt(evaluations, totalScore, unknownItems, notes);
+              }
+              if (isPsw) {
+                return mode === 'signal'
+                  ? generatePswSignalPrompt(evaluations, totalScore, unknownItems, notes)
+                  : generatePswBriefPrompt(evaluations, totalScore, unknownItems, notes);
+              }
+              return mode === 'signal'
                 ? generateSignalPrompt(evaluations, totalScore, unknownItems, notes)
-                : generateBriefPrompt(evaluations, totalScore, unknownItems, notes)
-            }
+                : generateBriefPrompt(evaluations, totalScore, unknownItems, notes);
+            }}
           />
 
           <div style={{
@@ -200,14 +233,26 @@ export function ExecutiveSummaryPage() {
             border: '1px solid rgba(170,255,0,0.25)',
             borderLeft: '3px solid var(--accent-green)',
             borderRadius: 4,
-            fontSize: '0.88rem',
+            fontSize: '0.85rem',
             color: '#ccc',
-            lineHeight: 1.8,
+            lineHeight: 1.9,
             fontWeight: 500,
           }}>
-            コピーした内容を自分のAIモデルに投入してください。<br />
-            <span style={{ color: 'var(--accent-green)', fontWeight: 700 }}>
-              フリープランでも上位モデルだと精度が上がります。
+            コピーした内容をAIに貼り付けてください。<br />
+            <br />
+            <span style={{ color: 'var(--accent-green)', fontWeight: 700 }}>【精度を上げる4つのコツ】</span><br />
+            1. 上位モデルを使う（Claude Opus / GPT-4o / Gemini Pro）<br />
+            <span style={{ color: '#888', fontSize: '0.78rem' }}>　→ フリープランでもモデル切替で精度が大きく変わります</span><br />
+            2. GPTは「深く考える」モードで実行する<br />
+            <span style={{ color: '#888', fontSize: '0.78rem' }}>　→ o1 / o3 / Deep Research などの推論モードを活用</span><br />
+            3. 出力後「もっと具体的に」と追加で指示する<br />
+            <span style={{ color: '#888', fontSize: '0.78rem' }}>　→ 1回で完璧を求めず、対話で精度を上げるのがAI活用の基本</span><br />
+            4. メモアプリに入れて保存する<br />
+            <span style={{ color: '#888', fontSize: '0.78rem' }}>　→ 出力結果をそのまま記録・共有・引継ぎに活用</span><br />
+            <br />
+            <span style={{ color: 'var(--status-warning)', fontWeight: 700 }}>【出力は必ず叩き台として扱ってください】</span><br />
+            <span style={{ color: '#aaa', fontSize: '0.8rem' }}>
+              AIの出力には事実誤認・制度の変更・患者固有の事情の見落としが含まれる可能性があります。
             </span>
           </div>
         </>
