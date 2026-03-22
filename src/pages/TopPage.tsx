@@ -295,6 +295,37 @@ export function TopPage() {
           )}
 
           <button
+            onClick={() => navigate('/otr')}
+            style={{
+              padding: '16px 28px',
+              background: 'rgba(0,229,204,0.05)',
+              border: '1px solid var(--accent-teal, #00e5cc)',
+              borderRadius: 4,
+              color: 'var(--accent-teal, #00e5cc)',
+              fontFamily: 'inherit',
+              fontSize: 'clamp(0.8rem, 1.8vw, 0.9rem)',
+              letterSpacing: '0.1em',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              minHeight: 52,
+              textTransform: 'uppercase',
+              transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,229,204,0.1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(0,229,204,0.05)'; }}
+          >
+            <div>
+              <div>OTRアセスメント</div>
+              <div style={{ fontSize: '0.62rem', color: 'rgba(0,229,204,0.5)', marginTop: 2, fontWeight: 400, textTransform: 'none' }}>
+                作業療法士用 · 18 ITEMS · SIGNAL / BRIEF
+              </div>
+            </div>
+            <span>→</span>
+          </button>
+
+          <button
             onClick={() => navigate('/history')}
             style={{
               padding: '16px 28px',

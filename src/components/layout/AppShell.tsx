@@ -8,6 +8,11 @@ const NAV_ITEMS = [
   { label: 'HISTORY', path: '/history' },
 ];
 
+const OTR_NAV_ITEMS = [
+  { label: 'OTR入力', path: '/otr' },
+  { label: '詳細・プロンプト', path: '/otr/detail' },
+];
+
 interface AppShellProps {
   children: ReactNode;
 }
@@ -16,6 +21,7 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const isTop = location.pathname === '/';
+  const isOtr = location.pathname.startsWith('/otr');
 
   return (
     <div
@@ -107,8 +113,8 @@ export function AppShell({ children }: AppShellProps) {
               borderTop: '1px solid #1e2a1e',
             }}
           >
-            {NAV_ITEMS.map(({ label, path }) => {
-              const active = location.pathname.startsWith(path);
+            {(isOtr ? OTR_NAV_ITEMS : NAV_ITEMS).map(({ label, path }) => {
+              const active = location.pathname === path;
               return (
                 <button
                   key={path}
@@ -135,12 +141,40 @@ export function AppShell({ children }: AppShellProps) {
                 </button>
               );
             })}
+            {isOtr && (
+              <button
+                onClick={() => navigate('/')}
+                style={{
+                  padding: '10px 12px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '2px solid transparent',
+                  color: '#555',
+                  fontFamily: 'inherit',
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.08em',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  minHeight: 44,
+                  flexShrink: 0,
+                }}
+              >
+                ← HOME
+              </button>
+            )}
           </div>
         )}
       </header>
 
       {/* メインコンテンツ */}
-      <main style={{ flex: 1, overflowY: 'auto' }}>
+      <main
+        key={location.pathname}
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          animation: 'fade-up 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
+        }}
+      >
         {children}
       </main>
     </div>

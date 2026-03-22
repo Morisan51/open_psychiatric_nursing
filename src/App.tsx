@@ -7,6 +7,8 @@ import { HistoryPage } from './pages/HistoryPage';
 import { AddToHomeBanner } from './components/AddToHomeBanner';
 import { AssessmentProvider } from './context/AssessmentContext';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
+import { OTRPage } from './pages/OTRPage';
+import { OTRDetailPage } from './pages/OTRDetailPage';
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
             <Route path="/summary" element={<SummaryPage />} />
             <Route path="/executive" element={<ExecutiveSummaryPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/otr" element={<OTRPage />} />
+            <Route path="/otr/detail" element={<OTRDetailPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AppShell>
