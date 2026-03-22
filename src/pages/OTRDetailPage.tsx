@@ -163,12 +163,27 @@ export function OTRDetailPage() {
             <div style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6 }}>{basicInfo.chiefComplaint}</div>
           </div>
         )}
-        {basicInfo.adlStatus && (
-          <div>
-            <div style={{ fontSize: '0.62rem', color: '#555', marginBottom: 2 }}>ADL・生活状況</div>
-            <div style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6 }}>{basicInfo.adlStatus}</div>
-          </div>
-        )}
+        {Array.isArray(basicInfo.adlStatus)
+          ? basicInfo.adlStatus.some(s => s.trim()) && (
+            <div>
+              <div style={{ fontSize: '0.62rem', color: '#555', marginBottom: 4 }}>ADL・生活状況</div>
+              {basicInfo.adlStatus.map((s, i) => s.trim() ? (
+                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 3 }}>
+                  <span style={{ fontSize: '0.7rem', color: '#555', flexShrink: 0, marginTop: 2 }}>
+                    {['①','②','③','④','⑤'][i]}
+                  </span>
+                  <span style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6 }}>{s}</span>
+                </div>
+              ) : null)}
+            </div>
+          )
+          : (basicInfo.adlStatus as unknown as string) && (
+            <div>
+              <div style={{ fontSize: '0.62rem', color: '#555', marginBottom: 2 }}>ADL・生活状況</div>
+              <div style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6 }}>{basicInfo.adlStatus as unknown as string}</div>
+            </div>
+          )
+        }
       </div>
 
       {/* ===== スコアサマリー ===== */}

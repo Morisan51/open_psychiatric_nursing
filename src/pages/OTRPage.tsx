@@ -16,13 +16,20 @@ const EMPTY_BASIC_INFO: OtrBasicInfo = {
   gender: '',
   mainDiagnosis: '',
   chiefComplaint: '',
-  adlStatus: '',
+  adlStatus: ['', '', '', '', ''],
 };
 
 function loadFromStorage(): { basicInfo: OtrBasicInfo; scores: OtrScores } {
   try {
     const saved = localStorage.getItem('otr-current');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // 旧形式（adlStatus: string）を配列に変換
+      if (typeof parsed.basicInfo?.adlStatus === 'string') {
+        parsed.basicInfo.adlStatus = [parsed.basicInfo.adlStatus, '', '', '', ''];
+      }
+      return parsed;
+    }
   } catch { /* ignore */ }
   return { basicInfo: EMPTY_BASIC_INFO, scores: {} };
 }
@@ -143,26 +150,82 @@ export function OTRPage() {
 
         <div>
           <label style={labelStyle}>現在の生活状況（ADL）</label>
-          <textarea
-            placeholder="ADL・生活状況を入力"
-            value={basicInfo.adlStatus}
-            onChange={e => setBasicInfo(p => ({ ...p, adlStatus: e.target.value }))}
-            style={{ ...fieldStyle, minHeight: 72, resize: 'vertical' }}
-          />
+          <div style={{
+            background: '#070d07',
+            borderRadius: 4,
+            border: '1px solid #1e2a1e',
+            overflow: 'hidden',
+          }}>
+            {basicInfo.adlStatus.map((val, i) => (
+              <div key={i} style={{
+                display: 'grid',
+                gridTemplateColumns: '4rem 1fr',
+                borderBottom: i < 4 ? '1px solid #1a2a1a' : 'none',
+                minHeight: 48,
+              }}>
+                <div style={{
+                  padding: '10px 12px',
+                  fontSize: '0.75rem',
+                  color: '#666',
+                  borderRight: '1px solid #1a2a1a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexShrink: 0,
+                }}>
+                  ADL{['①','②','③','④','⑤'][i]}
+                </div>
+                <div style={{ padding: '8px 12px', display: 'flex', alignItems: 'center' }}>
+                  <textarea
+                    value={val}
+                    onChange={e => {
+                      const next = [...basicInfo.adlStatus];
+                      next[i] = e.target.value;
+                      setBasicInfo(p => ({ ...p, adlStatus: next }));
+                    }}
+                    placeholder={`ADL・生活状況${['①','②','③','④','⑤'][i]}を入力`}
+                    rows={2}
+                    style={{
+                      width: '100%',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: '1px solid #2a2a2a',
+                      color: val ? '#ccc' : '#444',
+                      fontFamily: 'inherit',
+                      fontSize: '0.85rem',
+                      lineHeight: 1.6,
+                      padding: '4px 0',
+                      outline: 'none',
+                      resize: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
+        {/* ヒントバナー */}
         <div style={{
           marginTop: 14,
-          padding: '10px 14px',
-          background: 'rgba(170,255,0,0.04)',
-          border: '1px solid rgba(170,255,0,0.2)',
-          borderLeft: '3px solid var(--accent-green)',
+          padding: '14px 16px',
+          background: 'rgba(170,255,0,0.06)',
+          border: '1px solid rgba(170,255,0,0.35)',
+          borderLeft: '4px solid var(--accent-green)',
           borderRadius: 4,
-          fontSize: '0.82rem',
-          color: '#aaa',
-          lineHeight: 1.7,
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 10,
         }}>
-          主訴とADLを具体的に入力すると、より個別性の高い分析が得られます
+          <span style={{ fontSize: '1rem', flexShrink: 0, marginTop: 1 }}>💡</span>
+          <div>
+            <div style={{ fontSize: '0.88rem', color: 'var(--accent-green)', fontWeight: 700, marginBottom: 2 }}>
+              AI分析精度を上げるコツ
+            </div>
+            <div style={{ fontSize: '0.8rem', color: '#bbb', lineHeight: 1.7 }}>
+              主訴とADLを具体的に入力すると、より個別性の高い分析が得られます
+            </div>
+          </div>
         </div>
       </div>
 

@@ -72,7 +72,7 @@ export interface OtrBasicInfo {
   gender: '男性' | '女性' | 'その他' | '';
   mainDiagnosis: string;
   chiefComplaint: string;
-  adlStatus: string;
+  adlStatus: string[]; // 5要素の配列
 }
 
 export type OtrScores = Record<string, number>;
@@ -136,7 +136,7 @@ export function generateOtrSignalPrompt(basicInfo: OtrBasicInfo, scores: OtrScor
 ${basicInfo.chiefComplaint || 'N/A'}
 
 【ADL・生活状況】
-${basicInfo.adlStatus || 'N/A'}
+${Array.isArray(basicInfo.adlStatus) ? basicInfo.adlStatus.filter(s => s.trim()).join('\n') || 'N/A' : basicInfo.adlStatus || 'N/A'}
 
 【OTRスコア】
 合計：${total}点 / ${maxPossible}点（評価可能項目の最大点）
@@ -204,7 +204,7 @@ export function generateOtrBriefPrompt(basicInfo: OtrBasicInfo, scores: OtrScore
 ${basicInfo.chiefComplaint || 'N/A'}
 
 【ADL・生活状況】
-${basicInfo.adlStatus || 'N/A'}
+${Array.isArray(basicInfo.adlStatus) ? basicInfo.adlStatus.filter(s => s.trim()).join('\n') || 'N/A' : basicInfo.adlStatus || 'N/A'}
 
 【OTRスコア】
 合計：${total}点 / ${maxPossible}点（評価可能項目の最大点）
