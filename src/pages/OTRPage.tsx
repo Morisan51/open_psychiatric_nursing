@@ -39,6 +39,7 @@ export function OTRPage() {
   }, [basicInfo, scores]);
 
   const { total, maxPossible, unknownCount } = calcOtrTotals(scores);
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
 
   const handleScore = (itemKey: string, score: number) => {
     setScores(prev => ({ ...prev, [itemKey]: score }));
@@ -179,49 +180,52 @@ export function OTRPage() {
                   marginBottom: 10,
                   background: '#0d1117',
                   borderRadius: 4,
-                  padding: '12px 14px',
-                  border: `1px solid ${selected !== undefined ? cat.color + '44' : '#1a2a1a'}`,
-                  transition: 'border-color 0.2s',
+                  borderLeft: `2px solid ${cat.color}`,
+                  padding: '16px',
                 }}>
                   <div style={{
-                    fontSize: '0.85rem',
-                    color: selected !== undefined ? cat.color : '#888',
-                    fontWeight: 700,
-                    marginBottom: 10,
-                    transition: 'color 0.2s',
+                    fontSize: '1rem',
+                    color: cat.color,
+                    fontWeight: 600,
+                    marginBottom: 14,
                   }}>
                     {item.label}
                   </div>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
                     {SCORES.map(score => {
                       const isSelected = selected === score;
                       const isUnknown = score === 0;
+                      const btnColor = isUnknown ? 'var(--status-warning, #ff6b35)' : cat.color;
+                      const hoverKey = `${item.key}-${score}`;
+                      const isHovered = hoveredKey === hoverKey;
                       return (
                         <button
                           key={score}
                           onClick={() => handleScore(item.key, score)}
+                          onMouseEnter={() => setHoveredKey(hoverKey)}
+                          onMouseLeave={() => setHoveredKey(null)}
                           style={{
-                            padding: '6px 10px',
+                            padding: '12px 16px',
                             background: isSelected
-                              ? (isUnknown ? 'rgba(100,100,100,0.15)' : `${cat.color}1a`)
-                              : 'transparent',
-                            border: `1px solid ${isSelected
-                              ? (isUnknown ? '#555' : cat.color)
-                              : '#2a2a2a'}`,
-                            borderRadius: 3,
-                            color: isSelected
-                              ? (isUnknown ? '#888' : cat.color)
-                              : '#444',
+                              ? (isUnknown ? 'rgba(255,107,53,0.15)' : `${cat.color}20`)
+                              : isHovered ? '#1a1f1a' : '#111618',
+                            border: `1px solid ${isSelected ? btnColor : isHovered ? '#666' : '#444'}`,
+                            borderRadius: 4,
+                            color: isSelected ? btnColor : isHovered ? '#eee' : '#ccc',
                             fontFamily: 'inherit',
-                            fontSize: '0.72rem',
+                            fontSize: '0.82rem',
                             cursor: 'pointer',
                             fontWeight: isSelected ? 700 : 400,
-                            transition: 'all 0.15s',
+                            transition: 'all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                             whiteSpace: 'nowrap',
-                            letterSpacing: '0.02em',
+                            letterSpacing: '0.03em',
+                            minHeight: 52,
+                            boxShadow: isSelected
+                              ? `0 0 10px ${isUnknown ? 'rgba(255,107,53,0.35)' : `${cat.color}50`}`
+                              : 'none',
                           }}
                         >
-                          {isUnknown ? '0：不明' : `${score}：${OTR_SCORE_LABELS[score]}`}
+                          {isUnknown ? '不明' : `${score}：${OTR_SCORE_LABELS[score]}`}
                         </button>
                       );
                     })}
