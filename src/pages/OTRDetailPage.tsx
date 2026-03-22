@@ -91,7 +91,7 @@ export function OTRDetailPage() {
   }
 
   const { basicInfo, scores } = data;
-  const { total, maxPossible, unknownCount } = calcOtrTotals(scores);
+  const { total, unknownCount } = calcOtrTotals(scores);
   const answeredCount = Object.keys(scores).length;
 
   const handleSave = async () => {
@@ -176,82 +176,108 @@ export function OTRDetailPage() {
         background: '#0d1117',
         border: '1px solid #1e2a1e',
         borderRadius: 4,
-        padding: '14px 16px',
+        padding: '16px',
         marginBottom: 20,
       }}>
-        <div style={{ fontSize: '0.6rem', color: '#444', letterSpacing: '0.2em', marginBottom: 12 }}>
+        <div style={{ fontSize: '0.6rem', color: '#444', letterSpacing: '0.2em', marginBottom: 16 }}>
           // SCORE SUMMARY
         </div>
 
-        <div style={{ display: 'flex', gap: 24, marginBottom: 16, flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ fontSize: '0.62rem', color: '#555', marginBottom: 4 }}>合計点</div>
-            <div style={{ fontSize: '1.6rem', color: 'var(--accent-green)', fontWeight: 700, lineHeight: 1 }}>
-              {total}
-              <span style={{ fontSize: '0.82rem', color: '#555', fontWeight: 400, marginLeft: 6 }}>/ {maxPossible} pt</span>
+        {/* 総得点バー */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--accent-green)', fontWeight: 700, letterSpacing: '0.08em' }}>
+              TOTAL SCORE
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
+              <span style={{ fontSize: '1.6rem', color: 'var(--accent-green)', fontWeight: 700, lineHeight: 1 }}>{total}</span>
+              <span style={{ fontSize: '0.78rem', color: '#555' }}>/ 72 pt</span>
+              <span style={{ fontSize: '0.72rem', color: 'var(--accent-green)', opacity: 0.7, marginLeft: 4 }}>
+                {Math.round((total / 72) * 100)}%
+              </span>
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: '0.62rem', color: '#555', marginBottom: 4 }}>不明・評価不能</div>
-            <div style={{ fontSize: '1.6rem', color: '#777', fontWeight: 700, lineHeight: 1 }}>
-              {unknownCount}
-              <span style={{ fontSize: '0.82rem', color: '#555', fontWeight: 400, marginLeft: 6 }}>項目</span>
-            </div>
+          <div style={{ height: 12, background: '#111', borderRadius: 6, overflow: 'hidden' }}>
+            <div style={{
+              height: '100%',
+              width: `${(total / 72) * 100}%`,
+              background: 'linear-gradient(90deg, var(--accent-green), rgba(170,255,0,0.6))',
+              borderRadius: 6,
+              transition: 'width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+              boxShadow: '0 0 8px rgba(170,255,0,0.4)',
+            }} />
           </div>
-          <div>
-            <div style={{ fontSize: '0.62rem', color: '#555', marginBottom: 4 }}>評価済み</div>
-            <div style={{ fontSize: '1.6rem', color: '#888', fontWeight: 700, lineHeight: 1 }}>
-              {answeredCount}
-              <span style={{ fontSize: '0.82rem', color: '#555', fontWeight: 400, marginLeft: 6 }}>/ 18 項目</span>
-            </div>
+          <div style={{ display: 'flex', gap: 16, marginTop: 8 }}>
+            <span style={{ fontSize: '0.65rem', color: '#555' }}>
+              不明・評価不能 <span style={{ color: '#777', fontWeight: 700 }}>{unknownCount}</span> 項目
+            </span>
+            <span style={{ fontSize: '0.65rem', color: '#555' }}>
+              評価済み <span style={{ color: '#777', fontWeight: 700 }}>{answeredCount}</span> / 18 項目
+            </span>
           </div>
         </div>
 
-        {/* カテゴリ別スコア表 */}
-        {OTR_CATEGORIES.map(cat => {
-          const { catTotal, catMax, catUnknown } = calcOtrCategoryTotals(cat, scores);
-          return (
-            <div key={cat.key} style={{ marginBottom: 12 }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 6,
-              }}>
-                <div style={{ fontSize: '0.7rem', color: cat.color, fontWeight: 700 }}>
-                  {cat.label}
+        <div style={{ borderTop: '1px solid #1a1a1a', paddingTop: 16 }}>
+          {/* カテゴリ別バー */}
+          {OTR_CATEGORIES.map(cat => {
+            const { catTotal, catUnknown } = calcOtrCategoryTotals(cat, scores);
+            const catAbsMax = cat.items.length * 4;
+            const pct = catAbsMax > 0 ? (catTotal / catAbsMax) * 100 : 0;
+            return (
+              <div key={cat.key} style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5 }}>
+                  <div style={{ fontSize: '0.78rem', color: cat.color, fontWeight: 700 }}>
+                    {cat.label}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                    <span style={{ fontSize: '1rem', color: cat.color, fontWeight: 700 }}>{catTotal}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#555' }}>/ {catAbsMax} pt</span>
+                    {catUnknown > 0 && (
+                      <span style={{ fontSize: '0.62rem', color: '#444', marginLeft: 4 }}>不明{catUnknown}</span>
+                    )}
+                  </div>
                 </div>
-                <div style={{ fontSize: '0.72rem', color: '#555' }}>
-                  {catMax > 0 ? `${catTotal} / ${catMax} pt` : '–'}
-                  {catUnknown > 0 && <span style={{ color: '#444', marginLeft: 8 }}>不明 {catUnknown}</span>}
+                <div style={{ height: 8, background: '#111', borderRadius: 4, overflow: 'hidden' }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${pct}%`,
+                    background: cat.color,
+                    borderRadius: 4,
+                    transition: 'width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    opacity: 0.85,
+                  }} />
+                </div>
+                {/* 項目別スコア */}
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
+                  {cat.items.map(item => {
+                    const s = scores[item.key];
+                    const isUndefined = s === undefined;
+                    return (
+                      <div key={item.key} style={{
+                        padding: '3px 8px',
+                        background: '#0a0f0a',
+                        border: `1px solid ${isUndefined ? '#1a1a1a' : (s === 0 ? '#333' : `${cat.color}44`)}`,
+                        borderRadius: 3,
+                        fontSize: '0.68rem',
+                        display: 'flex',
+                        gap: 4,
+                        alignItems: 'center',
+                      }}>
+                        <span style={{ color: '#666' }}>{item.label}</span>
+                        <span style={{ color: isUndefined ? '#333' : (s === 0 ? '#555' : cat.color), fontWeight: 700 }}>
+                          {isUndefined ? '–' : (s === 0 ? '不明' : `${s}pt`)}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                {cat.items.map(item => {
-                  const s = scores[item.key];
-                  const isUndefined = s === undefined;
-                  return (
-                    <div key={item.key} style={{
-                      padding: '4px 8px',
-                      background: isUndefined ? 'transparent' : '#111',
-                      border: `1px solid ${isUndefined ? '#1a1a1a' : (s === 0 ? '#333' : `${SCORE_COLORS[s]}55`)}`,
-                      borderRadius: 3,
-                      fontSize: '0.68rem',
-                    }}>
-                      <span style={{ color: '#555', marginRight: 4 }}>{item.label}</span>
-                      <span style={{ color: isUndefined ? '#333' : (s === 0 ? '#555' : SCORE_COLORS[s]), fontWeight: 700 }}>
-                        {isUndefined ? '–' : (s === 0 ? '不明' : `${s}pt`)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
 
-        {/* 項目別スコア参照 */}
-        <div style={{ marginTop: 10, padding: '10px 0', borderTop: '1px solid #1a1a1a' }}>
+        {/* SCORE LEGEND */}
+        <div style={{ marginTop: 6, padding: '10px 0', borderTop: '1px solid #1a1a1a' }}>
           <div style={{ fontSize: '0.6rem', color: '#444', letterSpacing: '0.1em', marginBottom: 6 }}>SCORE LEGEND</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
             {[4, 3, 2, 1, 0].map(s => (
