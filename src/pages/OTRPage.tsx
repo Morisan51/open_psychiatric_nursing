@@ -65,11 +65,12 @@ export function OTRPage() {
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize: '0.68rem',
-    color: '#666',
-    letterSpacing: '0.1em',
+    fontSize: '0.8rem',
+    color: '#aaa',
+    letterSpacing: '0.06em',
     marginBottom: 6,
     display: 'block',
+    fontWeight: 600,
   };
 
   return (
@@ -141,13 +142,27 @@ export function OTRPage() {
         </div>
 
         <div>
-          <label style={labelStyle}>現在の生活状況・ADL</label>
+          <label style={labelStyle}>現在の生活状況（ADL）</label>
           <textarea
             placeholder="ADL・生活状況を入力"
             value={basicInfo.adlStatus}
             onChange={e => setBasicInfo(p => ({ ...p, adlStatus: e.target.value }))}
             style={{ ...fieldStyle, minHeight: 72, resize: 'vertical' }}
           />
+        </div>
+
+        <div style={{
+          marginTop: 14,
+          padding: '10px 14px',
+          background: 'rgba(170,255,0,0.04)',
+          border: '1px solid rgba(170,255,0,0.2)',
+          borderLeft: '3px solid var(--accent-green)',
+          borderRadius: 4,
+          fontSize: '0.82rem',
+          color: '#aaa',
+          lineHeight: 1.7,
+        }}>
+          主訴とADLを具体的に入力すると、より個別性の高い分析が得られます
         </div>
       </div>
 
