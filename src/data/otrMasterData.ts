@@ -129,6 +129,12 @@ export function generateOtrSignalPrompt(basicInfo: OtrBasicInfo, scores: OtrScor
 以下のOTRアセスメント結果を分析し、簡潔なサマリーを作成してください。
 記載以外の事実は生成しない。欠落はN/Aと記す。
 
+現場の多職種（医師・看護師・PSW）が読むことを前提に、
+専門用語を使わず平易な日本語で記述すること。
+
+【悪い例】構造化環境と段階的支援を通じて参加拡大を図る
+【良い例】決まった流れの中で、少しずつ参加できる活動を増やす
+
 【基本情報】
 年齢：${basicInfo.age || 'N/A'}歳 / 性別：${basicInfo.gender || 'N/A'} / 主疾患：${basicInfo.mainDiagnosis || 'N/A'}
 
@@ -198,6 +204,12 @@ export function generateOtrBriefPrompt(basicInfo: OtrBasicInfo, scores: OtrScore
 以下のOTRアセスメント結果をもとに、作業療法士の臨床判断を支援する
 詳細な構造化分析を提供してください。
 記載以外の事実は生成しない。欠落はN/Aと記す。
+
+現場の多職種（医師・看護師・PSW）が読むことを前提に、
+専門用語を使わず平易な日本語で記述すること。
+
+【悪い例】構造化環境と段階的支援を通じて参加拡大を図る
+【良い例】決まった流れの中で、少しずつ参加できる活動を増やす
 
 【基本情報】
 年齢：${basicInfo.age || 'N/A'}歳 / 性別：${basicInfo.gender || 'N/A'} / 主疾患：${basicInfo.mainDiagnosis || 'N/A'}
