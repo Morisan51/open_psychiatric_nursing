@@ -9,6 +9,7 @@ import { AssessmentProvider } from './context/AssessmentContext';
 import { ExecutiveSummaryPage } from './pages/ExecutiveSummaryPage';
 import { OTRPage } from './pages/OTRPage';
 import { OTRDetailPage } from './pages/OTRDetailPage';
+import { DetailedAssessmentPage } from './pages/DetailedAssessmentPage';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/otr" element={<OTRPage />} />
             <Route path="/otr/detail" element={<OTRDetailPage />} />
+            <Route path="/detailed" element={<DetailedAssessmentPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AppShell>

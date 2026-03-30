@@ -1,20 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import localforage from 'localforage';
-import {
-  MAX_SCORE,
-  getJudgment,
-  CATEGORIES,
-  CATEGORY_COLORS,
-  ITEMS_BY_CATEGORY,
-  SCORED_ITEMS,
-} from '../data/masterData';
 import { useAssessmentContext } from '../context/AssessmentContext';
 import { SummaryTable } from '../components/summary/SummaryTable';
 
 // カテゴリ別の最大スコアを算出
-function getCategoryMaxScore(category: string): number {
-  return (ITEMS_BY_CATEGORY[category] ?? [])
+import type { EvaluationItem } from '../data/masterData';
+
+function getCategoryMaxScore(category: string, itemsByCategory: Record<string, EvaluationItem[]>): number {
+  return (itemsByCategory[category] ?? [])
     .filter(i => !i.isInfoOnly)
     .reduce((sum, item) => {
       const max = Math.max(...item.options.map(o => o.score ?? 0));
@@ -40,28 +34,40 @@ const JUDGMENT_COLOR = {
 
 export function SummaryPage() {
   const navigate = useNavigate();
-  const { state, totalScore, answeredCount, unknownItems, reset } =
-    useAssessmentContext();
+  const {
+    state, totalScore, answeredCount, unknownItems, reset,
+    categories, categoryColors, itemsByCategory, maxScore, scoredItems, getJudgmentFn,
+  } = useAssessmentContext();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [summaryNotes, setSummaryNotes] = useState<string[]>(() => {
     try {
       const s = localStorage.getItem('summary-notes');
-      return s ? JSON.parse(s) : ['', '', '', '', ''];
+      if (!s) return ['', '', '', '', ''];
+      const parsed = JSON.parse(s);
+      // 旧形式（配列）との互換性 + 24時間TTLチェック
+      if (Array.isArray(parsed)) return parsed;
+      const { notes, savedAt } = parsed as { notes: string[]; savedAt: number };
+      const TTL_MS = 24 * 60 * 60 * 1000; // 24時間
+      if (Date.now() - savedAt > TTL_MS) {
+        localStorage.removeItem('summary-notes');
+        return ['', '', '', '', ''];
+      }
+      return notes;
     } catch { return ['', '', '', '', '']; }
   });
   const updateSummaryNote = (i: number, value: string) => {
     const next = [...summaryNotes];
     next[i] = value;
     setSummaryNotes(next);
-    localStorage.setItem('summary-notes', JSON.stringify(next));
+    localStorage.setItem('summary-notes', JSON.stringify({ notes: next, savedAt: Date.now() }));
   };
 
-  const judgment = getJudgment(totalScore);
-  const pct = Math.round((totalScore / MAX_SCORE) * 100);
+  const judgment = getJudgmentFn(totalScore);
+  const pct = Math.round((totalScore / maxScore) * 100);
 
   // 未回答の採点対象項目
-  const unanswered = SCORED_ITEMS.filter(item => !(item.key in state.evaluations));
+  const unanswered = scoredItems.filter(item => !(item.key in state.evaluations));
 
   const handleSave = async () => {
     setSaving(true);
@@ -121,7 +127,7 @@ export function SummaryPage() {
           {answeredCount === 0 ? '—' : totalScore}
         </div>
         <div style={{ fontSize: '0.8rem', color: '#555', marginTop: 4 }}>
-          / {MAX_SCORE} pt
+          / {maxScore} pt
         </div>
 
         {/* 進捗バー */}
@@ -143,7 +149,7 @@ export function SummaryPage() {
               }} />
             </div>
             <div style={{ fontSize: '0.72rem', color: '#666', marginTop: 6 }}>
-              {pct}% / 回答済み {answeredCount} / {SCORED_ITEMS.length} 項目
+              {pct}% / 回答済み {answeredCount} / {scoredItems.length} 項目
             </div>
           </div>
         )}
@@ -173,12 +179,12 @@ export function SummaryPage() {
           // CATEGORY BREAKDOWN
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {CATEGORIES.filter(cat => getCategoryMaxScore(cat) > 0).map(cat => {
+          {categories.filter(cat => getCategoryMaxScore(cat, itemsByCategory) > 0).map(cat => {
             const catScore = getCategoryScore(cat, state.evaluations);
-            const catMax = getCategoryMaxScore(cat);
+            const catMax = getCategoryMaxScore(cat, itemsByCategory);
             const catPct = catMax > 0 ? Math.round((catScore / catMax) * 100) : 0;
-            const color = CATEGORY_COLORS[cat];
-            const catItems = (ITEMS_BY_CATEGORY[cat] ?? []).filter(i => !i.isInfoOnly);
+            const color = categoryColors[cat];
+            const catItems = (itemsByCategory[cat] ?? []).filter(i => !i.isInfoOnly);
             const answered = catItems.filter(i => i.key in state.evaluations).length;
 
             return (

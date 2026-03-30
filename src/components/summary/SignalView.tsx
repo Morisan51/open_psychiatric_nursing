@@ -1,4 +1,4 @@
-import { getJudgment, MAX_SCORE, CATEGORY_COLORS } from '../../data/masterData';
+import { useAssessmentContext } from '../../context/AssessmentContext';
 import { getPriorityIssues, getPriorityCategories } from './summaryHelpers';
 import type { EvaluationEntry } from '../../hooks/useAssessment';
 
@@ -29,9 +29,11 @@ function Block({ label, value, color }: { label: string; value: string; color?: 
 }
 
 export function SignalView({ evaluations, totalScore, unknownItems, notes = [] }: Props) {
-  const judgment = getJudgment(totalScore);
+  const { getJudgmentFn, maxScore, categoryColors, scoredItems, itemsByCategory, assessmentType } = useAssessmentContext();
+  const judgment = getJudgmentFn(totalScore);
   const scoreColor = JUDGMENT_COLOR[judgment.level];
-  const pct = Math.round((totalScore / MAX_SCORE) * 100);
+  const pct = Math.round((totalScore / maxScore) * 100);
+  const isNurse = assessmentType === 'nurse';
 
   const age = evaluations['age']?.selectedValue ?? '未入力';
   const gender = evaluations['gender']?.selectedValue ?? '未入力';
@@ -40,15 +42,17 @@ export function SignalView({ evaluations, totalScore, unknownItems, notes = [] }
     ? unknownItems.map(e => e.item).join('、')
     : '該当なし';
 
-  const priorityIssues = getPriorityIssues(evaluations);
-  const priorityCategories = getPriorityCategories(evaluations);
+  const priorityIssues = getPriorityIssues(evaluations, scoredItems);
+  const priorityCategories = getPriorityCategories(evaluations, itemsByCategory);
 
-  // 精神症状の注目項目（0または1ptのもの）
-  const psychiatricAlerts = ['hallucination', 'moodStability', 'selfHarmRisk']
-    .map(key => evaluations[key])
-    .filter(Boolean)
-    .filter(e => e.score <= 1)
-    .map(e => `${e.item}[${e.selectedValue}]`);
+  // 精神症状の注目項目（看護師モードのみ）
+  const psychiatricAlerts = isNurse
+    ? (['hallucination', 'moodStability', 'selfHarmRisk']
+        .map(key => evaluations[key])
+        .filter(Boolean)
+        .filter(e => e.score <= 1)
+        .map(e => `${e.item}[${e.selectedValue}]`))
+    : [];
 
   return (
     <div style={{
@@ -68,15 +72,17 @@ export function SignalView({ evaluations, totalScore, unknownItems, notes = [] }
       }}>
         <div>
           <div style={{ fontSize: '0.58rem', color: '#555', letterSpacing: '0.2em' }}>SIGNAL // 圧縮・即時・現場判断用</div>
-          <div style={{ fontSize: '0.82rem', color: '#888', marginTop: 4 }}>
-            {age}　{gender}　{mainDisease}
-          </div>
+          {isNurse && (
+            <div style={{ fontSize: '0.82rem', color: '#888', marginTop: 4 }}>
+              {age}　{gender}　{mainDisease}
+            </div>
+          )}
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: '2rem', fontWeight: 700, color: scoreColor, lineHeight: 1 }}>
             {totalScore}
           </div>
-          <div style={{ fontSize: '0.65rem', color: '#666' }}>/ {MAX_SCORE} pt ({pct}%)</div>
+          <div style={{ fontSize: '0.65rem', color: '#666' }}>/ {maxScore} pt ({pct}%)</div>
         </div>
       </div>
 
@@ -103,7 +109,7 @@ export function SignalView({ evaluations, totalScore, unknownItems, notes = [] }
           label="重点支援領域"
           value={priorityCategories}
           color={priorityCategories !== '該当なし'
-            ? CATEGORY_COLORS[priorityCategories.split('、')[0]] ?? '#ddd'
+            ? categoryColors[priorityCategories.split('、')[0]] ?? '#ddd'
             : '#ddd'}
         />
         {psychiatricAlerts.length > 0 && (

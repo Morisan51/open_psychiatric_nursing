@@ -142,10 +142,12 @@ export function TopPage() {
         }}>
           Psychiatric Discharge Support Tool<br />
           <span style={{ color: 'var(--accent-green)', fontWeight: 700, letterSpacing: '0.05em' }}>
-            AIエージェント時代の退院支援インフラ
+            AIエージェント時代の関係性をコンパイルするインフラ
           </span>
           <br />
-          <span style={{ color: '#666' }}>全22項目 / 最大{MAX_SCORE}点 / 完全ローカル動作</span>
+          <span style={{ color: '#aaa', fontSize: '0.85em', fontStyle: 'italic' }}>
+            AIが「記録する医療従事者」になれば、人は「関わる医療従事者」に戻れる
+          </span>
         </p>
 
         {/* アクションボタン */}
@@ -299,6 +301,7 @@ export function TopPage() {
                   padding: '18px 20px',
                   background: 'transparent',
                   border: 'none',
+                  borderBottom: '1px solid rgba(170,255,0,0.15)',
                   color: '#00e5cc',
                   fontFamily: 'inherit',
                   fontSize: '0.9rem',
@@ -318,6 +321,36 @@ export function TopPage() {
                   <div>OTR ASSESSMENT</div>
                   <div style={{ fontSize: '0.65rem', color: 'rgba(0,229,204,0.4)', marginTop: 2, fontWeight: 400 }}>
                     作業療法士用 · 18 ITEMS · SIGNAL / BRIEF
+                  </div>
+                </div>
+                <span>→</span>
+              </button>
+              <button
+                onClick={() => navigate('/detailed')}
+                style={{
+                  width: '100%',
+                  padding: '18px 20px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--accent-purple)',
+                  fontFamily: 'inherit',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(191,95,255,0.06)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <div>
+                  <div>DETAILED DISCHARGE ASSESSMENT</div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(191,95,255,0.4)', marginTop: 2, fontWeight: 400 }}>
+                    退院支援詳細 · 7カテゴリ · 168 ITEMS
                   </div>
                 </div>
                 <span>→</span>
@@ -363,51 +396,222 @@ export function TopPage() {
       </section>
 
       {/* ===== システム情報セクション ===== */}
-      <section style={{ padding: '48px 20px', background: '#0a0f0a' }}>
-        <div style={{
-          fontSize: '0.7rem', color: 'var(--accent-cyan)',
-          letterSpacing: '0.2em', marginBottom: 24,
-        }}>
-          // SYSTEM OVERVIEW
-        </div>
+      <section style={{ background: '#0a0f0a' }}>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, maxWidth: 600 }}>
-          {[
-            ['評価カテゴリ', '9'],
-            ['採点対象項目', '22'],
-            ['最大合計点', `${MAX_SCORE} pt`],
-            ['判定レベル', '3段階'],
-            ['データ保存', 'ローカル端末'],
-            ['外部通信', 'なし'],
-          ].map(([label, value]) => (
-            <div key={label} style={{ padding: '14px 16px', background: '#0d1117', borderBottom: '1px solid #111' }}>
-              <div style={{ fontSize: '0.62rem', color: '#666', marginBottom: 4 }}>{label}</div>
-              <div style={{ fontSize: '1rem', color: '#ddd', fontWeight: 600 }}>{value}</div>
-            </div>
-          ))}
-        </div>
-
+        {/* ── Stats Bar ── */}
         <div style={{
-          marginTop: 32, padding: '20px', background: '#0d1117',
-          borderRadius: 4, borderLeft: '2px solid var(--accent-orange)', maxWidth: 600,
+          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+          borderTop: '1px solid #151515', borderBottom: '1px solid #151515',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--accent-orange)', letterSpacing: '0.15em', marginBottom: 16 }}>
-            // JUDGMENT CRITERIA
-          </div>
           {[
-            { range: '0 〜 22 pt', label: '集中支援フェーズ', color: 'var(--accent-red)' },
-            { range: '23 〜 44 pt', label: '支援継続が必要', color: 'var(--accent-orange)' },
-            { range: '45 〜 66 pt', label: '退院調整可能', color: 'var(--accent-green)' },
-          ].map(({ range, label, color }) => (
-            <div key={range} style={{
-              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-              padding: '10px 0', borderBottom: '1px solid #1a1a1a',
+            { value: '4', label: 'アセスメント種別' },
+            { value: '80+', label: '総評価項目数' },
+            { value: '2', label: 'AIプロンプトモード' },
+            { value: '0', label: '外部通信' },
+          ].map(({ value, label }) => (
+            <div key={label} style={{
+              padding: '20px 12px', borderRight: '1px solid #151515', textAlign: 'center',
             }}>
-              <span style={{ fontSize: '0.85rem', color: '#999', fontWeight: 600 }}>{range}</span>
-              <span style={{ fontSize: '0.85rem', color }}>{label}</span>
+              <div style={{ fontSize: 'clamp(1.6rem, 6vw, 2.4rem)', fontWeight: 700, color: '#fff', lineHeight: 1 }}>{value}</div>
+              <div style={{ fontSize: '0.5rem', color: '#333', marginTop: 6, letterSpacing: '0.12em', textTransform: 'uppercase' }}>{label}</div>
             </div>
           ))}
         </div>
+
+        {/* ── Active Modules ── */}
+        <div style={{ padding: '40px 20px 0' }}>
+          <div style={{ fontSize: '0.65rem', color: 'var(--accent-green)', letterSpacing: '0.25em', marginBottom: 16 }}>
+            // ACTIVE MODULES
+          </div>
+
+          {/* NURSING — メインカード */}
+          <div style={{
+            borderLeft: '2px solid var(--accent-green)', background: '#0d1117',
+            padding: '24px 20px', marginBottom: 1,
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)', letterSpacing: '0.12em' }}>NURSING ASSESSMENT</div>
+              <div style={{ fontSize: '0.5rem', color: 'var(--accent-green)', letterSpacing: '0.15em', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent-green)', display: 'inline-block', boxShadow: '0 0 6px var(--accent-green)' }} />
+                LIVE
+              </div>
+            </div>
+            <div style={{ fontSize: '0.65rem', color: '#444', marginBottom: 20 }}>看護師用退院支援アセスメント</div>
+            <div style={{ fontSize: 'clamp(2.2rem, 9vw, 3.5rem)', fontWeight: 700, color: 'var(--accent-green)', lineHeight: 1, marginBottom: 24, textShadow: '0 0 40px rgba(170,255,0,0.25)' }}>
+              {MAX_SCORE}<span style={{ fontSize: '0.9rem', color: '#333', marginLeft: 8, fontWeight: 400 }}>PT MAX</span>
+            </div>
+            {[
+              { label: 'CATEGORIES', value: 9, max: 9, pct: 100 },
+              { label: 'ITEMS', value: 22, max: 22, pct: 100 },
+              { label: 'JUDGMENT LEVELS', value: 3, max: 3, pct: 100 },
+            ].map(({ label, value, pct }) => (
+              <div key={label} style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+                  <span style={{ fontSize: '0.55rem', color: '#444', letterSpacing: '0.12em' }}>{label}</span>
+                  <span style={{ fontSize: '0.7rem', color: '#888', fontWeight: 600 }}>{value}</span>
+                </div>
+                <div style={{ height: 2, background: '#1a1a1a', borderRadius: 1 }}>
+                  <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-green)', boxShadow: '0 0 6px rgba(170,255,0,0.4)', borderRadius: 1 }} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* PSW + LONG-TERM */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, marginBottom: 1 }}>
+            <div style={{ borderLeft: '2px solid var(--accent-cyan)', background: '#0d1117', padding: '20px 16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-cyan)', letterSpacing: '0.1em' }}>PSW</div>
+                <div style={{ fontSize: '0.48rem', color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent-cyan)', display: 'inline-block' }} />LIVE
+                </div>
+              </div>
+              <div style={{ fontSize: '0.55rem', color: '#333', marginBottom: 16 }}>精神保健福祉士用</div>
+              <div style={{ fontSize: 'clamp(1.8rem, 7vw, 2.8rem)', fontWeight: 700, color: 'var(--accent-cyan)', lineHeight: 1, marginBottom: 16, textShadow: '0 0 30px rgba(0,255,255,0.2)' }}>
+                {PSW_MAX_SCORE}<span style={{ fontSize: '0.7rem', color: '#333', marginLeft: 6, fontWeight: 400 }}>PT</span>
+              </div>
+              {[
+                { label: 'ITEMS', value: 20, pct: 91 },
+                { label: 'AI MODES', value: 2, pct: 100 },
+              ].map(({ label, value, pct }) => (
+                <div key={label} style={{ marginBottom: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.5rem', color: '#333', letterSpacing: '0.1em' }}>{label}</span>
+                    <span style={{ fontSize: '0.65rem', color: '#666', fontWeight: 600 }}>{value}</span>
+                  </div>
+                  <div style={{ height: 2, background: '#1a1a1a' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-cyan)', boxShadow: '0 0 5px rgba(0,255,255,0.3)' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ borderLeft: '2px solid var(--accent-purple)', background: '#0d1117', padding: '20px 16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-purple)', letterSpacing: '0.1em' }}>LONG-TERM</div>
+                <div style={{ fontSize: '0.48rem', color: 'var(--accent-purple)', display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent-purple)', display: 'inline-block' }} />LIVE
+                </div>
+              </div>
+              <div style={{ fontSize: '0.55rem', color: '#333', marginBottom: 16 }}>長期療養アセスメント</div>
+              <div style={{ fontSize: 'clamp(1.8rem, 7vw, 2.8rem)', fontWeight: 700, color: 'var(--accent-purple)', lineHeight: 1, marginBottom: 16, textShadow: '0 0 30px rgba(191,95,255,0.2)' }}>
+                {LONG_TERM_MAX_SCORE}<span style={{ fontSize: '0.7rem', color: '#333', marginLeft: 6, fontWeight: 400 }}>PT</span>
+              </div>
+              {[
+                { label: 'SPECIALTY', value: '慢性期', pct: 85 },
+                { label: 'AI MODES', value: 2, pct: 100 },
+              ].map(({ label, value, pct }) => (
+                <div key={label} style={{ marginBottom: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                    <span style={{ fontSize: '0.5rem', color: '#333', letterSpacing: '0.1em' }}>{label}</span>
+                    <span style={{ fontSize: '0.65rem', color: '#666', fontWeight: 600 }}>{value}</span>
+                  </div>
+                  <div style={{ height: 2, background: '#1a1a1a' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: 'var(--accent-purple)', boxShadow: '0 0 5px rgba(191,95,255,0.3)' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* OTR */}
+          <div style={{ borderLeft: '2px solid #00e5cc', background: '#0d1117', padding: '20px', marginBottom: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#00e5cc', letterSpacing: '0.12em' }}>OTR ASSESSMENT</div>
+              <div style={{ fontSize: '0.5rem', color: '#00e5cc', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#00e5cc', display: 'inline-block', boxShadow: '0 0 6px #00e5cc' }} />
+                LIVE
+              </div>
+            </div>
+            <div style={{ fontSize: '0.65rem', color: '#444', marginBottom: 16 }}>作業療法士用 — SIGNAL / BRIEF 両対応</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '0 32px', alignItems: 'center' }}>
+              <div style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', fontWeight: 700, color: '#00e5cc', textShadow: '0 0 30px rgba(0,229,204,0.25)' }}>
+                18<span style={{ fontSize: '0.8rem', color: '#333', marginLeft: 6, fontWeight: 400 }}>ITEMS</span>
+              </div>
+              <div>
+                {[
+                  { label: 'SCALE', value: '4 → 0', pct: 100 },
+                  { label: 'AI MODES', value: 'SIGNAL / BRIEF', pct: 100 },
+                ].map(({ label, value, pct }) => (
+                  <div key={label} style={{ marginBottom: 10 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontSize: '0.55rem', color: '#444', letterSpacing: '0.1em' }}>{label}</span>
+                      <span style={{ fontSize: '0.65rem', color: '#666', fontWeight: 600 }}>{value}</span>
+                    </div>
+                    <div style={{ height: 2, background: '#1a1a1a' }}>
+                      <div style={{ height: '100%', width: `${pct}%`, background: '#00e5cc', boxShadow: '0 0 5px rgba(0,229,204,0.3)' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Judgment Criteria — Terminal style ── */}
+        <div style={{ margin: '32px 20px 0' }}>
+          <div style={{ border: '1px solid #151515', borderRadius: 4, overflow: 'hidden' }}>
+            <div style={{
+              padding: '8px 14px', borderBottom: '1px solid #151515',
+              display: 'flex', alignItems: 'center', gap: 6, background: '#0d1117',
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff5f57', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ffbd2e', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#28c840', display: 'inline-block' }} />
+              <span style={{ fontSize: '0.55rem', color: '#333', marginLeft: 8, letterSpacing: '0.1em' }}>judgment-criteria — nursing assessment</span>
+            </div>
+            <div style={{ background: '#0d1117', padding: '20px' }}>
+              <div style={{ fontSize: '0.6rem', color: 'var(--accent-orange)', letterSpacing: '0.2em', marginBottom: 16 }}>// JUDGMENT CRITERIA</div>
+              {[
+                { range: '0 〜 22 pt', label: '集中支援フェーズ', color: 'var(--accent-red)', pct: 33 },
+                { range: '23 〜 44 pt', label: '支援継続が必要', color: 'var(--accent-orange)', pct: 67 },
+                { range: `45 〜 ${MAX_SCORE} pt`, label: '退院調整可能', color: 'var(--accent-green)', pct: 100 },
+              ].map(({ range, label, color, pct }) => (
+                <div key={range} style={{ marginBottom: 16 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: '0.75rem', color: '#555', fontWeight: 600 }}>{range}</span>
+                    <span style={{ fontSize: '0.75rem', color, fontWeight: 700 }}>{label}</span>
+                  </div>
+                  <div style={{ height: 2, background: '#151515', borderRadius: 1 }}>
+                    <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 1 }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── System Specs ── */}
+        <div style={{ margin: '1px 20px 48px' }}>
+          <div style={{ border: '1px solid #151515', borderRadius: 4, overflow: 'hidden' }}>
+            <div style={{
+              padding: '8px 14px', borderBottom: '1px solid #151515',
+              display: 'flex', alignItems: 'center', gap: 6, background: '#0d1117',
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ff5f57', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ffbd2e', display: 'inline-block' }} />
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#28c840', display: 'inline-block' }} />
+              <span style={{ fontSize: '0.55rem', color: '#333', marginLeft: 8, letterSpacing: '0.1em' }}>system-specs — infrastructure</span>
+            </div>
+            <div style={{ background: '#0d1117' }}>
+              {[
+                { key: 'DATA_STORAGE', value: 'localforage // ローカル端末のみ', color: 'var(--accent-green)' },
+                { key: 'EXTERNAL_COMM', value: 'none // オフライン完全動作', color: 'var(--accent-cyan)' },
+                { key: 'PWA_SUPPORT', value: 'enabled // ホーム画面追加可', color: 'var(--accent-purple)' },
+                { key: 'AI_PROMPT_GEN', value: 'SIGNAL + BRIEF // 全種別対応', color: '#00e5cc' },
+              ].map(({ key, value, color }) => (
+                <div key={key} style={{
+                  padding: '14px 20px', borderBottom: '1px solid #0f0f0f',
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12,
+                }}>
+                  <span style={{ fontSize: '0.6rem', color: '#333', letterSpacing: '0.1em', flexShrink: 0 }}>{key}</span>
+                  <span style={{ fontSize: '0.65rem', color, textAlign: 'right' }}>{value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
       </section>
     </div>
   );

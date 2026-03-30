@@ -1,4 +1,4 @@
-import { getJudgment, MAX_SCORE } from '../../data/masterData';
+import { useAssessmentContext } from '../../context/AssessmentContext';
 import {
   getCategoryText,
   getPriorityIssues,
@@ -56,7 +56,8 @@ function Row({ label, value, highlight }: { label: string; value: string; highli
 }
 
 export function SummaryTable({ evaluations, totalScore, unknownItems, notes, onNoteChange }: Props) {
-  const judgment = getJudgment(totalScore);
+  const { getJudgmentFn, maxScore, scoredItems, itemsByCategory, assessmentType } = useAssessmentContext();
+  const judgment = getJudgmentFn(totalScore);
   const age = evaluations['age']?.selectedValue ?? '';
   const gender = evaluations['gender']?.selectedValue ?? '';
   const mainDisease = evaluations['mainDisease']?.selectedValue ?? '';
@@ -64,11 +65,12 @@ export function SummaryTable({ evaluations, totalScore, unknownItems, notes, onN
   const unknownText = unknownItems.length > 0
     ? unknownItems.map(e => e.item).join('、')
     : '該当なし';
-  const psychiatricText = getCategoryText('精神症状', evaluations);
-  const livingText = [
-    getCategoryText('ADL', evaluations),
-    getCategoryText('生活スキル', evaluations),
-  ].filter(t => t !== '未回答').join('\n') || '未回答';
+  const isNurse = assessmentType === 'nurse';
+  const psychiatricText = isNurse ? getCategoryText('精神症状', evaluations) : '';
+  const livingText = isNurse
+    ? ([getCategoryText('ADL', evaluations), getCategoryText('生活スキル', evaluations)]
+        .filter(t => t !== '未回答').join('\n') || '未回答')
+    : '';
 
   return (
     <div style={{
@@ -110,17 +112,17 @@ export function SummaryTable({ evaluations, totalScore, unknownItems, notes, onN
         </div>
       </div>
 
-      <Row label="合計点（/66）" value={`${totalScore} / ${MAX_SCORE} pt`} highlight />
+      <Row label={`合計点（/${maxScore}）`} value={`${totalScore} / ${maxScore} pt`} highlight />
       <Row label="判定コメント" value={judgment.text} />
-      <Row label="年齢" value={age} />
-      <Row label="性別" value={gender} />
-      <Row label="主疾患" value={mainDisease} />
-      <Row label="合併症" value={complication} />
-      <Row label="優先対応課題" value={getPriorityIssues(evaluations)} />
-      <Row label="支援の土台" value={getStrengths(evaluations)} />
-      <Row label="重点支援領域" value={getPriorityCategories(evaluations)} />
-      <Row label="精神症状の特徴" value={psychiatricText} />
-      <Row label="生活環境の特徴" value={livingText} />
+      {isNurse && <Row label="年齢" value={age} />}
+      {isNurse && <Row label="性別" value={gender} />}
+      {isNurse && <Row label="主疾患" value={mainDisease} />}
+      {isNurse && <Row label="合併症" value={complication} />}
+      <Row label="優先対応課題" value={getPriorityIssues(evaluations, scoredItems)} />
+      <Row label="支援の土台" value={getStrengths(evaluations, scoredItems)} />
+      <Row label="重点支援領域" value={getPriorityCategories(evaluations, itemsByCategory)} />
+      {isNurse && <Row label="精神症状の特徴" value={psychiatricText} />}
+      {isNurse && <Row label="生活環境の特徴" value={livingText} />}
       <Row label="要確認項目（不明）" value={unknownText} />
 
       {/* 特記事項1〜5（編集可能な場合のみ） */}

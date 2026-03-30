@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import localforage from 'localforage';
 import { CATEGORY_COLORS, CATEGORIES, ITEMS_BY_CATEGORY } from '../data/masterData';
+import { PSW_CATEGORY_COLORS, PSW_CATEGORIES, PSW_ITEMS_BY_CATEGORY } from '../data/pswMasterData';
+
+// 看護師・PSW両方のカラーをマージ（履歴の混在表示に対応）
+const ALL_CATEGORY_COLORS = { ...CATEGORY_COLORS, ...PSW_CATEGORY_COLORS };
+const ALL_CATEGORIES = [...CATEGORIES, ...PSW_CATEGORIES];
+const ALL_ITEMS_BY_CATEGORY = { ...ITEMS_BY_CATEGORY, ...PSW_ITEMS_BY_CATEGORY };
 import type { EvaluationEntry } from '../hooks/useAssessment';
 
 interface HistoryRecord {
@@ -32,7 +38,7 @@ function getCategoryScore(category: string, evaluations: Record<string, Evaluati
 }
 
 function getCategoryMax(category: string): number {
-  return (ITEMS_BY_CATEGORY[category] ?? [])
+  return (ALL_ITEMS_BY_CATEGORY[category] ?? [])
     .filter(i => !i.isInfoOnly)
     .reduce((s, i) => s + Math.max(...i.options.map(o => o.score ?? 0)), 0);
 }
@@ -86,11 +92,11 @@ function RecordDetail({ record, onDelete }: { record: HistoryRecord; onDelete: (
         <div style={{ fontSize: '0.6rem', color: '#444', letterSpacing: '0.15em', marginBottom: 8 }}>
           CATEGORY SCORES
         </div>
-        {CATEGORIES.filter(cat => getCategoryMax(cat) > 0).map(cat => {
+        {ALL_CATEGORIES.filter(cat => getCategoryMax(cat) > 0 && Object.values(record.evaluations).some(e => e.category === cat)).map(cat => {
           const got = getCategoryScore(cat, record.evaluations);
           const max = getCategoryMax(cat);
           const pct = max > 0 ? Math.round((got / max) * 100) : 0;
-          const catColor = CATEGORY_COLORS[cat];
+          const catColor = ALL_CATEGORY_COLORS[cat];
           return (
             <div key={cat} style={{ marginBottom: 6 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>

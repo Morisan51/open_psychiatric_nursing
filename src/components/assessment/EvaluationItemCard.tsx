@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CATEGORY_COLORS } from '../../data/masterData';
+import { useAssessmentContext } from '../../context/AssessmentContext';
 import type { EvaluationItem, EvaluationOption } from '../../data/masterData';
 import type { EvaluationEntry } from '../../hooks/useAssessment';
 
@@ -35,20 +35,24 @@ function OptionTooltip({ opt, color }: TooltipProps) {
         zIndex: 200,
         pointerEvents: 'none',
         boxShadow: `0 0 16px rgba(0,0,0,0.8), 0 0 8px ${color}30`,
+        animation: 'fade-up 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
       }}
     >
-      {opt.comment && (
-        <div style={{ fontSize: '0.88rem', color: '#ddd', lineHeight: 1.6, marginBottom: opt.criteria ? 8 : 0 }}>
-          {opt.comment}
-        </div>
-      )}
       {opt.criteria && (
         <div style={{
-          fontSize: '0.78rem', color: '#aaa', lineHeight: 1.6,
-          borderTop: opt.comment ? '1px solid #222' : 'none',
-          paddingTop: opt.comment ? 8 : 0,
+          fontSize: '1.1rem', fontWeight: 700, color: '#fff', lineHeight: 1.6,
+          marginBottom: opt.comment ? 10 : 0,
         }}>
           {opt.criteria}
+        </div>
+      )}
+      {opt.comment && (
+        <div style={{
+          fontSize: '0.72rem', color: '#777', lineHeight: 1.6,
+          borderTop: opt.criteria ? '1px solid #222' : 'none',
+          paddingTop: opt.criteria ? 8 : 0,
+        }}>
+          {opt.comment}
         </div>
       )}
       <div style={{
@@ -62,7 +66,8 @@ function OptionTooltip({ opt, color }: TooltipProps) {
 }
 
 export function EvaluationItemCard({ item, entry, onSelect }: EvaluationItemCardProps) {
-  const color = CATEGORY_COLORS[item.category];
+  const { categoryColors } = useAssessmentContext();
+  const color = categoryColors[item.category] ?? 'var(--accent-green)';
   const selectedValue = entry?.selectedValue;
   const [hoveredValue, setHoveredValue] = useState<string | null>(null);
 
@@ -143,7 +148,7 @@ export function EvaluationItemCard({ item, entry, onSelect }: EvaluationItemCard
                   fontSize: valueFontSize,
                   cursor: 'pointer',
                   minHeight: compact ? 40 : 52,
-                  transition: 'all 0.15s',
+                  transition: 'all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
                   boxShadow: selected
                     ? `0 0 10px ${isUnknown ? 'rgba(255,107,53,0.35)' : `${color}50`}`
                     : 'none',

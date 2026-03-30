@@ -32,6 +32,7 @@ export function AddToHomeBanner() {
       display: 'flex',
       alignItems: 'flex-start',
       gap: 12,
+      animation: 'slide-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both',
     }}>
       <div style={{ flex: 1 }}>
         <div style={{ color: '#aaff00', fontWeight: 700, fontSize: '0.85rem', marginBottom: 4 }}>

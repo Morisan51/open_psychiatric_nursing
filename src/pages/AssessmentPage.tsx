@@ -1,11 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import {
-  CATEGORIES,
-  CATEGORY_COLORS,
-  ITEMS_BY_CATEGORY,
-  MAX_SCORE,
-} from '../data/masterData';
-import type { CategoryName } from '../data/masterData';
 import { useAssessmentContext } from '../context/AssessmentContext';
 import { EvaluationItemCard } from '../components/assessment/EvaluationItemCard';
 
@@ -20,6 +13,10 @@ export function AssessmentPage() {
     answeredCount,
     scoredItemCount,
     isComplete,
+    categories,
+    categoryColors,
+    itemsByCategory,
+    maxScore,
   } = useAssessmentContext();
 
   const progress = Math.round((answeredCount / scoredItemCount) * 100);
@@ -50,7 +47,7 @@ export function AssessmentPage() {
           <span>{answeredCount} / {scoredItemCount} 項目</span>
           <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.9rem' }}>
             {totalScore}
-            <span style={{ fontSize: '0.65rem', color: '#777', fontWeight: 400 }}> / {MAX_SCORE} pt</span>
+            <span style={{ fontSize: '0.65rem', color: '#777', fontWeight: 400 }}> / {maxScore} pt</span>
           </span>
         </div>
         <div style={{ height: 2, background: '#1e2a1e', borderRadius: 1, overflow: 'hidden' }}>
@@ -100,9 +97,9 @@ export function AssessmentPage() {
       </div>
 
       {/* 全カテゴリを縦スクロール */}
-      {CATEGORIES.map((category: CategoryName) => {
-        const color = CATEGORY_COLORS[category];
-        const items = ITEMS_BY_CATEGORY[category] ?? [];
+      {categories.map((category) => {
+        const color = categoryColors[category];
+        const items = itemsByCategory[category] ?? [];
 
         return (
           <section key={category} id={`cat-${category}`}>

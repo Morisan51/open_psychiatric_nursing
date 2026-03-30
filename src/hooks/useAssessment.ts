@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { MASTER_DATA, SCORED_ITEMS } from '../data/masterData';
+import type { EvaluationItem } from '../data/masterData';
 
 export interface EvaluationEntry {
   category: string;
@@ -17,7 +17,7 @@ export interface AssessmentState {
 
 const INITIAL_STATE: AssessmentState = { memo: '', evaluations: {} };
 
-export function useAssessment() {
+export function useAssessment(masterData: EvaluationItem[], scoredItems: EvaluationItem[]) {
   const [state, setState] = useState<AssessmentState>(INITIAL_STATE);
 
   const setMemo = useCallback((memo: string) => {
@@ -25,7 +25,7 @@ export function useAssessment() {
   }, []);
 
   const selectOption = useCallback((itemKey: string, value: string) => {
-    const itemDef = MASTER_DATA.find(i => i.key === itemKey);
+    const itemDef = masterData.find(i => i.key === itemKey);
     if (!itemDef) return;
 
     setState(prev => {
@@ -54,7 +54,8 @@ export function useAssessment() {
         },
       };
     });
-  }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [masterData]);
 
   const reset = useCallback(() => {
     setState(INITIAL_STATE);
@@ -66,11 +67,11 @@ export function useAssessment() {
   );
 
   const answeredCount = Object.keys(state.evaluations).length;
-  const scoredItemCount = SCORED_ITEMS.length; // 22
+  const scoredItemCount = scoredItems.length;
 
   const unknownItems = Object.values(state.evaluations).filter(e => e.isUnknown);
 
-  const isComplete = SCORED_ITEMS.every(item => item.key in state.evaluations);
+  const isComplete = scoredItems.every(item => item.key in state.evaluations);
 
   return {
     state,
