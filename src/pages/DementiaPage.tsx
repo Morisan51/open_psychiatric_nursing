@@ -493,22 +493,46 @@ export function DementiaPage() {
             >
               AI出力を生成する →
             </button>
+
+            <div style={{
+              height: 1,
+              background: '#1a1a1a',
+              margin: '8px 0',
+            }} />
+
             <button
               onClick={handleReset}
               style={{
                 width: '100%',
-                padding: '12px',
+                padding: '14px',
                 background: 'transparent',
-                border: '1px solid #2a2a2a',
+                border: '1px solid #3a1a1a',
                 borderRadius: 4,
-                color: '#444',
+                color: '#884444',
                 fontFamily: 'inherit',
-                fontSize: '0.75rem',
+                fontSize: '0.8rem',
+                fontWeight: 700,
                 letterSpacing: '0.1em',
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = 'rgba(255,68,68,0.06)';
+                (e.currentTarget as HTMLElement).style.borderColor = '#ff4444';
+                (e.currentTarget as HTMLElement).style.color = '#ff4444';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = 'transparent';
+                (e.currentTarget as HTMLElement).style.borderColor = '#3a1a1a';
+                (e.currentTarget as HTMLElement).style.color = '#884444';
               }}
             >
-              リセット
+              <span>✕</span>
+              <span>アセスメントをクリア</span>
             </button>
           </div>
         </>

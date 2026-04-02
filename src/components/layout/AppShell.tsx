@@ -13,6 +13,17 @@ const OTR_NAV_ITEMS = [
   { label: '詳細・プロンプト', path: '/otr/detail' },
 ];
 
+const DETAILED_NAV_ITEMS = [
+  { label: 'ASSESS', path: '/detailed' },
+  { label: 'SUMMARY', path: '/detailed-summary' },
+  { label: 'EXEC', path: '/detailed-executive' },
+];
+
+const DEMENTIA_NAV_ITEMS = [
+  { label: '入力', path: '/dementia' },
+  { label: 'AI出力', path: '/dementia-detail' },
+];
+
 interface AppShellProps {
   children: ReactNode;
 }
@@ -22,6 +33,8 @@ export function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const isTop = location.pathname === '/';
   const isOtr = location.pathname.startsWith('/otr');
+  const isDetailed = location.pathname.startsWith('/detailed');
+  const isDementia = location.pathname.startsWith('/dementia');
 
   return (
     <div
@@ -113,8 +126,21 @@ export function AppShell({ children }: AppShellProps) {
               borderTop: '1px solid #1e2a1e',
             }}
           >
-            {(isOtr ? OTR_NAV_ITEMS : NAV_ITEMS).map(({ label, path }) => {
+            {(isOtr
+              ? OTR_NAV_ITEMS
+              : isDetailed
+              ? DETAILED_NAV_ITEMS
+              : isDementia
+              ? DEMENTIA_NAV_ITEMS
+              : NAV_ITEMS
+            ).map(({ label, path }) => {
               const active = location.pathname === path;
+              const accentColor = isDementia
+                ? 'var(--accent-orange)'
+                : 'var(--accent-green)';
+              const activeBg = isDementia
+                ? 'rgba(255,107,53,0.06)'
+                : 'rgba(170,255,0,0.06)';
               return (
                 <button
                   key={path}
@@ -122,12 +148,12 @@ export function AppShell({ children }: AppShellProps) {
                   style={{
                     flex: 1,
                     padding: '10px 8px',
-                    background: active ? 'rgba(170,255,0,0.06)' : 'transparent',
+                    background: active ? activeBg : 'transparent',
                     border: 'none',
                     borderBottom: active
-                      ? '2px solid var(--accent-green)'
+                      ? `2px solid ${accentColor}`
                       : '2px solid transparent',
-                    color: active ? 'var(--accent-green)' : '#888',
+                    color: active ? accentColor : '#888',
                     fontFamily: 'inherit',
                     fontSize: '0.72rem',
                     letterSpacing: '0.12em',
@@ -141,7 +167,7 @@ export function AppShell({ children }: AppShellProps) {
                 </button>
               );
             })}
-            {isOtr && (
+            {(isOtr || isDetailed || isDementia) && (
               <button
                 onClick={() => navigate('/')}
                 style={{
