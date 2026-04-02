@@ -1,7 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import type { DementiaDirectionKey } from '../data/dementiaAssessmentData';
-
-const STORAGE_KEY = 'dementia-current';
 
 export interface DementiaBasicInfo {
   gender: string;
@@ -37,20 +35,8 @@ const INITIAL_STATE: DementiaState = {
   memo: '',
 };
 
-function loadFromStorage(): DementiaState {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return { ...INITIAL_STATE, ...JSON.parse(saved) };
-  } catch { /* ignore */ }
-  return INITIAL_STATE;
-}
-
 export function useDementiaAssessment() {
-  const [state, setState] = useState<DementiaState>(loadFromStorage);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+  const [state, setState] = useState<DementiaState>(INITIAL_STATE);
 
   const setBasicInfo = useCallback((field: keyof DementiaBasicInfo, value: string) => {
     setState(prev => ({
@@ -99,7 +85,6 @@ export function useDementiaAssessment() {
 
   const reset = useCallback(() => {
     setState(INITIAL_STATE);
-    localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   return {
