@@ -630,7 +630,15 @@ export function getDementiaVisibleItems(
 
 // ===== AI Prompt Generators =====
 
+export interface DementiaBasicInfo {
+  gender: string;
+  age: string;
+  diagnosis: string;
+  comorbidities: string;
+}
+
 export interface DementiaAssessmentData {
+  basicInfo: DementiaBasicInfo;
   direction: DementiaDirectionKey | null;
   directionReason: string;
   radioAnswers: Record<string, string>;
@@ -681,6 +689,12 @@ export function generateDementiaSignalPrompt(data: DementiaAssessmentData): stri
 
 ---
 【アセスメントデータ】
+
+■ 基本情報
+性別: ${data.basicInfo.gender || '未入力'}
+年齢: ${data.basicInfo.age || '未入力'}
+疾患名: ${data.basicInfo.diagnosis || '未入力'}
+身体合併症: ${data.basicInfo.comorbidities || '未入力'}
 
 ■ 方向性の判断
 ${getDirectionLabel(data.direction)}
@@ -759,6 +773,12 @@ export function generateDementiaBriefPrompt(data: DementiaAssessmentData): strin
 
 ---
 【アセスメントデータ】
+
+■ 基本情報
+性別: ${data.basicInfo.gender || '未入力'}
+年齢: ${data.basicInfo.age || '未入力'}
+疾患名: ${data.basicInfo.diagnosis || '未入力'}
+身体合併症: ${data.basicInfo.comorbidities || '未入力'}
 
 ■ 方向性の判断
 ${getDirectionLabel(data.direction)}

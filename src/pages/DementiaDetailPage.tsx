@@ -93,6 +93,7 @@ export function DementiaDetailPage() {
 
   const getPrompt = () => {
     const data = {
+      basicInfo: state.basicInfo,
       direction: state.direction,
       directionReason: state.directionReason,
       radioAnswers: state.radioAnswers,
@@ -212,6 +213,10 @@ export function DementiaDetailPage() {
           // INPUT SUMMARY
         </div>
         <div style={{ padding: '8px 14px 12px' }}>
+          <SummaryRow label="性別" value={state.basicInfo.gender} />
+          <SummaryRow label="年齢" value={state.basicInfo.age} />
+          <SummaryRow label="疾患名" value={state.basicInfo.diagnosis} />
+          <SummaryRow label="身体合併症" value={state.basicInfo.comorbidities} />
           {visibleItems
             .filter(item => item.type !== 'text')
             .map(item => {

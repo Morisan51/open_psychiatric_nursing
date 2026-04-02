@@ -274,7 +274,7 @@ function useProgress() {
 
 export function DementiaPage() {
   const navigate = useNavigate();
-  const { state, setDirection, setDirectionReason, setMemo, reset } = useDementiaAssessmentContext();
+  const { state, setBasicInfo, setDirection, setDirectionReason, setMemo, reset } = useDementiaAssessmentContext();
   const { answered, total, pct } = useProgress();
 
   const handleReset = () => {
@@ -334,7 +334,78 @@ export function DementiaPage() {
         </div>
       </div>
 
-      {/* ① 方向性の判断 */}
+      {/* ① 基本情報 */}
+      <div style={{ padding: '0 16px', marginBottom: 32 }}>
+        <div style={{
+          padding: '10px 16px',
+          background: `${ACCENT_RGBA}0.06)`,
+          borderLeft: `2px solid ${ACCENT}`,
+          marginBottom: 16,
+        }}>
+          <div style={{ fontSize: '0.85rem', fontWeight: 700, color: ACCENT }}>
+            基本情報
+          </div>
+          <div style={{ fontSize: '0.6rem', color: '#555', marginTop: 2 }}>
+            患者情報（入力はAIプロンプトに反映されます）
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+          {([
+            { field: 'gender', label: '性別', placeholder: '例）男性' },
+            { field: 'age',    label: '年齢', placeholder: '例）82歳' },
+          ] as const).map(({ field, label, placeholder }) => (
+            <div key={field}>
+              <div style={{ fontSize: '0.68rem', color: '#666', marginBottom: 5 }}>{label}</div>
+              <input
+                type="text"
+                value={state.basicInfo[field]}
+                onChange={e => setBasicInfo(field, e.target.value)}
+                placeholder={placeholder}
+                style={{
+                  width: '100%',
+                  background: 'rgba(255,255,255,0.02)',
+                  border: `1px solid ${state.basicInfo[field] ? ACCENT : '#2a2a2a'}`,
+                  borderRadius: 4,
+                  color: '#e8e8e8',
+                  fontFamily: 'inherit',
+                  fontSize: '0.8rem',
+                  padding: '10px 12px',
+                  outline: 'none',
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {([
+          { field: 'diagnosis',     label: '疾患名',   placeholder: '例）アルツハイマー型認知症、レビー小体型認知症' },
+          { field: 'comorbidities', label: '身体合併症', placeholder: '例）高血圧、糖尿病、誤嚥性肺炎の既往' },
+        ] as const).map(({ field, label, placeholder }) => (
+          <div key={field} style={{ marginBottom: 10 }}>
+            <div style={{ fontSize: '0.68rem', color: '#666', marginBottom: 5 }}>{label}</div>
+            <input
+              type="text"
+              value={state.basicInfo[field]}
+              onChange={e => setBasicInfo(field, e.target.value)}
+              placeholder={placeholder}
+              style={{
+                width: '100%',
+                background: 'rgba(255,255,255,0.02)',
+                border: `1px solid ${state.basicInfo[field] ? ACCENT : '#2a2a2a'}`,
+                borderRadius: 4,
+                color: '#e8e8e8',
+                fontFamily: 'inherit',
+                fontSize: '0.8rem',
+                padding: '10px 12px',
+                outline: 'none',
+              }}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ② 方向性の判断 */}
       <div style={{ padding: '0 16px', marginBottom: 32 }}>
         <div style={{
           padding: '10px 16px',

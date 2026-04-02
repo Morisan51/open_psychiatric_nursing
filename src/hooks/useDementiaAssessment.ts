@@ -3,7 +3,15 @@ import type { DementiaDirectionKey } from '../data/dementiaAssessmentData';
 
 const STORAGE_KEY = 'dementia-current';
 
+export interface DementiaBasicInfo {
+  gender: string;
+  age: string;
+  diagnosis: string;
+  comorbidities: string;
+}
+
 export interface DementiaState {
+  basicInfo: DementiaBasicInfo;
   direction: DementiaDirectionKey | null;
   directionReason: string;
   radioAnswers: Record<string, string>;
@@ -12,7 +20,15 @@ export interface DementiaState {
   memo: string;
 }
 
+const EMPTY_BASIC_INFO: DementiaBasicInfo = {
+  gender: '',
+  age: '',
+  diagnosis: '',
+  comorbidities: '',
+};
+
 const INITIAL_STATE: DementiaState = {
+  basicInfo: EMPTY_BASIC_INFO,
   direction: null,
   directionReason: '',
   radioAnswers: {},
@@ -35,6 +51,13 @@ export function useDementiaAssessment() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  const setBasicInfo = useCallback((field: keyof DementiaBasicInfo, value: string) => {
+    setState(prev => ({
+      ...prev,
+      basicInfo: { ...prev.basicInfo, [field]: value },
+    }));
+  }, []);
 
   const setDirection = useCallback((direction: DementiaDirectionKey) => {
     setState(prev => ({ ...prev, direction }));
@@ -81,6 +104,7 @@ export function useDementiaAssessment() {
 
   return {
     state,
+    setBasicInfo,
     setDirection,
     setDirectionReason,
     setRadio,
