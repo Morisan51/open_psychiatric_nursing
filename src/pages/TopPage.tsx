@@ -226,8 +226,8 @@ export function TopPage() {
               >
                 <div>
                   <div>NURSING ASSESSMENT</div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(170,255,0,0.4)', marginTop: 2, fontWeight: 400 }}>
-                    22 ITEMS · MAX {MAX_SCORE} PT
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(170,255,0,0.85)', marginTop: 2, fontWeight: 400 }}>
+                    最小の問いで、最大の臨床を引き出す
                   </div>
                 </div>
                 <span>→</span>
@@ -257,8 +257,8 @@ export function TopPage() {
               >
                 <div>
                   <div>PSW ASSESSMENT</div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(0,255,255,0.4)', marginTop: 2, fontWeight: 400 }}>
-                    20 ITEMS · MAX {PSW_MAX_SCORE} PT
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(0,255,255,0.85)', marginTop: 2, fontWeight: 400 }}>
+                    看護と制度の間に落ちているものを拾う
                   </div>
                 </div>
                 <span>→</span>
@@ -288,8 +288,39 @@ export function TopPage() {
               >
                 <div>
                   <div>LONG-TERM CARE ASSESSMENT</div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(191,95,255,0.4)', marginTop: 2, fontWeight: 400 }}>
-                    長期療養アセスメント · MAX {LONG_TERM_MAX_SCORE} PT
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(191,95,255,0.85)', marginTop: 2, fontWeight: 400 }}>
+                    長期入院を「退院できない入院生活」から解放する
+                  </div>
+                </div>
+                <span>→</span>
+              </button>
+              <button
+                onClick={() => navigate('/dementia')}
+                style={{
+                  width: '100%',
+                  padding: '18px 20px',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid rgba(170,255,0,0.15)',
+                  color: 'var(--accent-orange)',
+                  fontFamily: 'inherit',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,107,53,0.06)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+              >
+                <div>
+                  <div>DEMENTIA ASSESSMENT</div>
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(255,107,53,0.85)', marginTop: 2, fontWeight: 400 }}>
+                    この人の今と、これからをどう支えるか
                   </div>
                 </div>
                 <span>→</span>
@@ -319,8 +350,8 @@ export function TopPage() {
               >
                 <div>
                   <div>OTR ASSESSMENT</div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(0,229,204,0.4)', marginTop: 2, fontWeight: 400 }}>
-                    作業療法士用 · 18 ITEMS · SIGNAL / BRIEF
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(0,229,204,0.85)', marginTop: 2, fontWeight: 400 }}>
+                    リカバリーを、見える構造に変える
                   </div>
                 </div>
                 <span>→</span>
@@ -349,8 +380,8 @@ export function TopPage() {
               >
                 <div>
                   <div>DETAILED DISCHARGE ASSESSMENT</div>
-                  <div style={{ fontSize: '0.65rem', color: 'rgba(191,95,255,0.4)', marginTop: 2, fontWeight: 400 }}>
-                    退院支援詳細 · 7カテゴリ · 168 ITEMS
+                  <div style={{ fontSize: '0.65rem', color: 'rgba(191,95,255,0.85)', marginTop: 2, fontWeight: 400 }}>
+                    精神科臨床戦略コンサルティング
                   </div>
                 </div>
                 <span>→</span>
@@ -404,7 +435,7 @@ export function TopPage() {
           borderTop: '1px solid #151515', borderBottom: '1px solid #151515',
         }}>
           {[
-            { value: '4', label: 'アセスメント種別' },
+            { value: '5', label: 'アセスメント種別' },
             { value: '80+', label: '総評価項目数' },
             { value: '2', label: 'AIプロンプトモード' },
             { value: '0', label: '外部通信' },
